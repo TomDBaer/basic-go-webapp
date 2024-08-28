@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -12,21 +14,25 @@ const portNumber = ":8080"
 
 // Home is the home page handler
 func Home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is the home page")
+	renderTemplate(w, "home.html")
 }
 
 // About is the about page handler
 func About(w http.ResponseWriter, r *http.Request) {
-	sum := addValues(2, 2)
-	//fmt.Fprintf(w, fmt.Sprintf("This is the about page and 2 + 2 is %d", sum))
-	fmt.Fprintf(w, "This is the about page and 2 + 2 is %d", sum)
+	renderTemplate(w, "about.html")
 }
 
-// addValues adds two integers and returns the sum
-func addValues(x, y int) int {
-	return x + y
+// renderTemplate renders the html templates
+func renderTemplate(w http.ResponseWriter, tmpl string) {
+	parsedTemplate, _ := template.ParseFiles("./templates/" + tmpl)
+	err := parsedTemplate.Execute(w, nil)
+	if err != nil {
+		log.Println("error parsing template:", err)
+		return
+	}
 }
 
+// Divide Route is just a placeholder.
 func Divide(w http.ResponseWriter, r *http.Request) {
 	x := 100.2
 	y := 10.3
@@ -40,6 +46,12 @@ func Divide(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%.2f divided by %.2f is %.2f", x, y, f)
 }
 
+// addValues adds two integers and returns the sum
+func addValues(x, y int) int {
+	return x + y
+}
+
+// divideValues divides two floats and returns the sum or error
 func divideValues(x, y float64) (float64, error) {
 
 	if y <= 0 {
