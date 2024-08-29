@@ -6,4 +6,4 @@ Tut es aber nicht
 
 - Design
   - Bootstrap durch Tailwind ersetzen
-- xox
+- Defer js im 'base.layout.html'
