@@ -1,21 +1,23 @@
-package main
+package handlers
 
 import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/TomDBaer/basic-go-webapp/pkg/render"
 )
 
 // Handler Funktionen
 
 // Home is the home page handler
 func Home(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "home.html")
+	render.RenderTemplate(w, "home.html")
 }
 
 // About is the about page handler
 func About(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "about.html")
+	render.RenderTemplate(w, "about.html")
 }
 
 //TODO: Kalkulation muss noch in eine eigene Datei geschoben werden
