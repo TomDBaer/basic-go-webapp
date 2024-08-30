@@ -12,6 +12,7 @@ import (
 
 // Home is the home page handler
 func Home(w http.ResponseWriter, r *http.Request) {
+	// render.RenderTemplateAdvanced(w, "home.page.html")
 	render.RenderTemplate(w, "home.page.html")
 }
 
