@@ -5,20 +5,52 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/TomDBaer/basic-go-webapp/pkg/config"
+	"github.com/TomDBaer/basic-go-webapp/pkg/models"
 	"github.com/TomDBaer/basic-go-webapp/pkg/render"
 )
 
 // Handler Funktionen
 
+// Repository pattern wird hier verwendet
+// Noch bescheiben was dies macht
+// Repo the repository used by the handlers
+var Repo *Repository
+
+// Repository is the repository type
+type Repository struct {
+	App *config.AppConfig
+}
+
+// NewRepo creates a new repository
+func NewRepo(a *config.AppConfig) *Repository {
+	return &Repository{
+		App: a,
+	}
+}
+
+// NewHandlers sets the repository for the handlers
+func NewHandlers(r *Repository) {
+	Repo = r
+}
+
 // Home is the home page handler
-func Home(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	// render.RenderTemplateAdvanced(w, "home.page.html")
 	render.RenderTemplate(w, "home.page.html")
 }
 
 // About is the about page handler
-func About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "about.page.html")
+func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
+
+	stringMap := make(map[string]string)
+	stringMap["test"] = "Hello over there."
+
+	// render.RenderTemplate(w, "about.page.html")
+
+	render.RenderTemplateAdvanced(w, "about.page.html", &models.TemplateData{
+		StringMap: stringMap,
+	})
 }
 
 //TODO: Kalkulation muss noch in eine eigene Datei geschoben werden
@@ -38,9 +70,9 @@ func Divide(w http.ResponseWriter, r *http.Request) {
 }
 
 // addValues adds two integers and returns the sum
-func addValues(x, y int) int {
-	return x + y
-}
+// func addValues(x, y int) int {
+// 	return x + y
+// }
 
 // divideValues divides two floats and returns the sum or error
 func divideValues(x, y float64) (float64, error) {

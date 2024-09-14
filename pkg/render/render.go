@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/TomDBaer/basic-go-webapp/pkg/config"
+	"github.com/TomDBaer/basic-go-webapp/pkg/models"
 )
 
 // Simpel und funktioniert wenn man wenig templates hat und man keinen cache nutzen will
@@ -20,7 +23,7 @@ func RenderTemplateBasic(w http.ResponseWriter, tmpl string) {
 	}
 }
 
-// Template render, cache und map
+// Template render, cache und map4
 var tc = make(map[string]*template.Template)
 
 // RenderTemplate renders the html templates
@@ -33,7 +36,7 @@ func RenderTemplate(w http.ResponseWriter, templ string) {
 	_, inMap := tc[templ]
 	if !inMap {
 		// not in cache, need to be created
-		err = createTemplateCache(templ)
+		err = CreateTemplateCache(templ)
 		if err != nil {
 			log.Println(err)
 		}
@@ -50,7 +53,7 @@ func RenderTemplate(w http.ResponseWriter, templ string) {
 	}
 }
 
-func createTemplateCache(t string) error {
+func CreateTemplateCache(t string) error {
 	templates := []string{
 		fmt.Sprintf("./templates/%s", t),
 		"./templates/base.layout.html",
@@ -71,25 +74,39 @@ func createTemplateCache(t string) error {
 	return nil
 }
 
-// RenderTemplateAdvanced renders the html templates || NOT USED
-func RenderTemplateAdvanced(w http.ResponseWriter, tmpl string) {
+var app *config.AppConfig
+
+// NewTemplates sets the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
+
+// TODO For later use
+func AddDefaultData(templateData *models.TemplateData) *models.TemplateData {
+
+	return templateData
+}
+
+// RenderTemplateAdvanced renders the html templates || partialy used
+func RenderTemplateAdvanced(w http.ResponseWriter, tmpl string, templateData *models.TemplateData) {
 
 	// create a template chache
-	templateCache, err := createTemplateCacheAdvanced()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("templateCache:", templateCache)
+	// Hier wird der cache von der config cache geladen
+	templateCache := app.TemplateCacheAdvanced
+
 	// get request template from cache
 	t, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get temlate from template cache")
 	}
 
-	// buffer || nicht nötig, soll bei Fehlersuche in der map helfen
+	// buffer || nicht nötig, soll bei der Fehlersuche in der map helfen
 	buf := new(bytes.Buffer)
 
-	err = t.Execute(buf, nil)
+	templateData = AddDefaultData(templateData)
+
+	// Wenn ich Daten übergeben will, ansonsten nil
+	err := t.Execute(buf, templateData)
 	if err != nil {
 		log.Println(err)
 	}
@@ -106,7 +123,7 @@ func RenderTemplateAdvanced(w http.ResponseWriter, tmpl string) {
 	// }
 }
 
-func createTemplateCacheAdvanced() (map[string]*template.Template, error) {
+func CreateTemplateCacheAdvanced() (map[string]*template.Template, error) {
 	// myCache := make(map[string]*template.Template)
 	myCache := map[string]*template.Template{}
 
